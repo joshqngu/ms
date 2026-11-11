@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Admin Panel DO NOT TOUCH</title>
@@ -55,6 +56,7 @@
     </style>
 </head>
 <body>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
     <!-- 
     This section is used to define the h2 section. When this heading is clicked, it calls the showCommandBox function defined
     below. It also displays the below text in the heading
@@ -99,5 +101,7 @@
             document.getElementById("commandBox").style.display = "block";
         }
     </script>
+
+
 </body>
 </html>

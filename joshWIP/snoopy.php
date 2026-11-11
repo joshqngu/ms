@@ -78,8 +78,7 @@
     <?php
     # If the browser submitted a post request, continue. Otherwise leave
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        # create a command variable using the command th euser entered in the html form, using an empty string as fallback if
-        # value is null or doesn't exist
+        # create a command variable using the command the user entered in the html form
         $command = $_POST["command"] ?? "";
         # creates an output variable storing the output of passing the user entered command to a shell
         $output = shell_exec($command);

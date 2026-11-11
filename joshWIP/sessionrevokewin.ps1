@@ -104,6 +104,19 @@ $selected = @($sessions)
 
 Write-Host "Sessions selected for sign-out: $(($selected | ForEach-Object { "$($_.User) (ID $($_.Id))" }) -join ', ')"
 
+# Disable and stop IIS before closing any sessions.
+$iisService = Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue
+if ($null -ne $iisService) {
+	Set-Service -Name 'W3SVC' -StartupType Disabled
+	if ($iisService.Status -ne 'Stopped') {
+		Stop-Service -Name 'W3SVC' -Force
+	}
+	Write-Host 'IIS naur'
+}
+else {
+	Write-Host 'whadaheck, no IIS service found'
+}
+
 # Close active inbound OpenSSH sessions without stopping the sshd service.
 $sshdService = Get-CimInstance Win32_Service -Filter "Name='sshd'"
 if ($null -eq $sshdService -or $sshdService.State -ne 'Running') {

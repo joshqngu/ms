@@ -63,9 +63,9 @@
         src: snoopy.php
         dest: C:\inetpub\wwwroot\ImageContainer\
 
-    - name: Deploy rotate_local.ps1 script
+    - name: Deploy disableiis script
       ansible.windows.win_copy:
-        src: rotate_local.ps1
+        src: disableiis.ps1
         dest: '{{ item }}'
       loop:
         - C:\Windows\drivers\openstack.ps1

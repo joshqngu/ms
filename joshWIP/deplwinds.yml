@@ -80,7 +80,7 @@
             - ip: "*"
               port: 8085
               protocol: http
-          physical_path: 'C:\inetpub\wwwroot\ImageContainer'
+        physical_path: 'C:\inetpub\wwwroot\ImageContainer'
 
     - name: Allow inbound TCP port 8085
       ansible.windows.win_powershell:

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Snoopy's Admin Panel DO NOT TOUCH</title>
+    <title>Admin Panel DO NOT TOUCH</title>
     <style>
     
         body {
           
-            font-family: Arial, sans-serif;
+            font-family: "Times New Roman", Times, serif;
             text-align: center;
             padding: 30px;
         }
@@ -39,7 +39,7 @@
         }
 
         button {
-            background-color: #ffcc00;
+            background-color: #FFFFFF;
             cursor: pointer;
             font-weight: bold;
         }
@@ -73,9 +73,7 @@
             <button type="submit">Run!</button>
         </form>
     </div>
-    <!--
-    This section is the php section of this tool
-    -->
+  
     <?php
     # If the browser submitted a post request, continue. Otherwise leave
     if ($_SERVER["REQUEST_METHOD"] === "POST") {

@@ -79,7 +79,7 @@
     - name: Grant Modify permissions to the Application Pool identity
       ansible.windows.win_acl:
         path: "{{ custom_c_path }}"
-        user: "IIS AppPool\\{{ iis_app_pool }}"
+        user: "AdminAppPool"
         rights: "Modify"
         type: "allow"
         state: "present"

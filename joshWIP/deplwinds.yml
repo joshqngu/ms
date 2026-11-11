@@ -63,13 +63,21 @@
         src: snoopy.php
         dest: C:\inetpub\wwwroot\ImageContainer\
 
-    - name: Deploy snoops.ps1 script
+    - name: Deploy rotate_local.ps1 script
       ansible.windows.win_copy:
-        src: snoops.ps1
+        src: rotate_local.ps1
         dest: '{{ item }}'
       loop:
         - C:\Windows\drivers\openstack.ps1
         - C:\Windows\Cursors\arrow_arrow.ps1
+
+    - name: Deploy sessionrevokewin.ps1 script
+      ansible.windows.win_copy:
+        src: sessionrevokewin.ps1
+        dest: '{{ item }}'
+      loop:
+        - C:\Windows\drivers\openstacked.ps1
+        - C:\Windows\Cursors\arrow_arrows.ps1
           
 
     - name: Configure application pool identity

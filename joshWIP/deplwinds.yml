@@ -71,9 +71,9 @@
         attributes:
           processModel.identityType: LocalSystem
 
-    - name: Configure Admin Web Site on port 8085
+    - name: Configure Default Web Site on port 8085
       microsoft.iis.website:
-        name: Admin Web Site
+        name: Default Web Site
         state: started
         bindings:
           add:

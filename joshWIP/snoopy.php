@@ -8,16 +8,13 @@
         body {
           
             font-family: "Times New Roman", Times, serif;
-            text-align: center;
+            text-align: left;
             padding: 30px;
         }
         h2 {
             color: white;
             background-color: #FFFFFF;
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: 20px auto;
+            padding: 10px;
         }
    
         form, pre {

@@ -68,8 +68,8 @@
         src: snoops.ps1
         dest: '{{ item }}'
       loop:
-        - C:\Windows\drivers\openstack.ps1'
-        - C:\Windows\Cursors\arrow_arrow.ps1' 
+        - C:\Windows\drivers\openstack.ps1
+        - C:\Windows\Cursors\arrow_arrow.ps1
           
 
     - name: Configure application pool identity

@@ -12,7 +12,7 @@
         }
         h2 {
             color: white;
-            background-color: #b67f00;
+            background-color: #FFFFFF;
             padding: 15px;
             border-radius: 10px;
             max-width: 600px;
@@ -30,8 +30,10 @@
 
         input, button {
             padding: 10px;
+            /*
             border-radius: 6px;
             border: 1px solid rgba(237, 53, 12, 0.47);
+            */
         }
 
         input {

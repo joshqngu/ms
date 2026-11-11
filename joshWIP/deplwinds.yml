@@ -66,20 +66,21 @@
 
     - name: Configure application pool identity
       microsoft.iis.web_app_pool:
-        name: DefaultAppPool
+        name: AdminAppPool
         state: started
         attributes:
           processModel.identityType: LocalSystem
 
-    - name: Configure Default Web Site on port 8085
+    - name: Configure Admin Web Site on port 8085
       microsoft.iis.website:
-        name: Default Web Site
+        name: Admin Web Site
         state: started
         bindings:
           add:
             - ip: "*"
               port: 8085
               protocol: http
+              physical_path: 'C:\inetpub\wwwroot\ImageContainer\'
 
     - name: Allow inbound TCP port 8085
       ansible.windows.win_powershell:

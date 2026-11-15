@@ -65,6 +65,15 @@
         state: "present"
         inherit: "ContainerInherit, ObjectInherit"
         propagation: "None"
+  
+    - name: Ensure AdminAppPool exists
+      microsoft.iis.web_app_pool:
+        name: AdminAppPool
+        state: started
+        attributes:
+          managedRuntimeVersion: v4.0
+          processModel.identityType: ApplicationPoolIdentity
+
 
     - name: Grant Read and Execute permissions to IUSR (for Anonymous Auth)
       ansible.windows.win_acl:
